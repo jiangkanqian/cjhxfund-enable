@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+  <display-name>头寸管理系统接口</display-name>
+
+  <filter>
+    <filter-name>actionFilter</filter-name>
+    <filter-class>com.cjhxfund.foundation.web.filter.ActionFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>actionFilter</filter-name>
+    <url-pattern>*.action</url-pattern>
+  </filter-mapping>
+
+  <!-- free:免登陆，auth：必须登录 -->
+  <context-param>
+    <param-name>requestModel</param-name>
+    <param-value>free</param-value>
+  </context-param>
+
+  <!-- 在测试环境时，开启debug模式，如果是生产环境则要关闭 -->
+  <context-param>
+    <param-name>debug</param-name>
+    <param-value>true</param-value>
+  </context-param>
+
+  <!-- 在测试环境时，开启debug模式，如果是生产环境则要关闭 -->
+  <context-param>
+    <param-name>suffix</param-name>
+    <param-value>.action</param-value>
+  </context-param>
+
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath*:applicationContext.xml</param-value>
+  </context-param>
+
+  <context-param>
+    <param-name>webAppRootKey</param-name>  
+    <param-value>enable.root</param-value>  
+  </context-param>
+
+</web-app>

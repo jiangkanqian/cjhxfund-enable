@@ -1,0 +1,524 @@
+<!Doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>系统API权限管理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script type="text/javascript">
+  var pathName = window.document.location.pathname;
+  var thiswebroot = pathName.substring(0, pathName.substr(1).indexOf('/') + 1);
+  var webroot="/ips";
+  document.write("<script type='text/javascript' src='"+webroot+"/static/js/common.js'><\/script>");
+</script>
+    
+<style type="text/css">
+.datagrid-row {
+    height: 30px;
+}
+
+.datagrid-cell-rownumber {
+    overflow: auto;
+}
+.datagrid-cell, .datagrid-cell-group, .datagrid-header-rownumber, .datagrid-cell-rownumber {
+    height: 25px;
+}
+.datagrid-header-rownumber, .datagrid-cell-rownumber {
+    line-height: 25px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="toolbar" style="padding: 0; margin: 0;" class="hide">
+    <div class="btn_opration">
+      <input placeholder="API名称" oninput="filterTables(this)" type="text" />
+      <a href="javascript:void(0)" class="btn  btn-white btn-sm" id="refreshContext"> 
+            <i class="icon-search"></i> 刷新列表</a>
+    </div>
+  </div>
+  
+<div id="toolbar1" style="padding: 0; margin: 0;" class="hide">
+    <div style="padding: 3px;">
+      <input placeholder="API名称" oninput="filterMonitor(this)" type="text" />
+      <a href="javascript:void(0)" class="btn  btn-white btn-sm" onclick="loadMonitorData()"> 
+            <i class="icon-undo"></i> 重新加载</a>
+      <a href="javascript:void(0)" class="btn  btn-white btn-sm" id="stopAPIRun"> 
+            <i class="icon-key"></i>停止运行</a>
+      <a href="javascript:void(0)" class="btn  btn-white btn-sm" id="startAPIRun"> 
+            <i class="icon-check"></i>开启运行</a>
+    </div>
+  </div>
+  
+  
+
+  <div class="main-container" id="main-container">
+    <div class="main-container-inner">
+    
+        <div class="page-content" >
+          <div class="row">
+            <div class="col-xs-12" style="padding: 0; margin: 0;">
+            
+              <div class="col-xs-4" >
+              
+               <div class="widget-box">
+                                <div class="widget-header header-color-blue2">
+                                    <h4>本系统API列表</h4>
+                                </div>
+
+                                <div class="widget-body">
+                                    <div class="widget-body-inner" style="display: block; ">
+                                        <div class="widget-main" style="padding: 0; margin: 0;">
+                                           
+                                   <table id="dg_table" class="easyui-datagrid" style="height: 450px; padding: 0; margin: 0;"
+                                                data-options="rownumbers:true, autoRowHeight:true,toolbar:'#toolbar', 
+                      selectOnCheck:true, checkOnSelect:true,singleSelect:true,method:'get' "
+                                            >
+                                            <thead>
+                                                <tr>
+                                                    <th data-options="field:'ck',checkbox:true"></th>
+                                                    <th field="apiName" width="200">请求名称</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                         </div>
+                        
+                         <div class="col-xs-8" >
+                
+               <div class="widget-box">
+                                <div class="widget-header header-color-blue2">
+                                    <h4>API详细信息</h4>
+                                </div>
+
+                                <div class="widget-body">
+                                    <div class="widget-body-inner" style="display: block; ">
+                                        <div class="widget-main" style="padding: 0; margin: 0;">
+                                           <div id="tt" class="easyui-tabs" >
+                                   
+                                            <div id="apiInfo" title="api详情">
+                                                <div class="profile-user-info profile-user-info-striped">
+                                                <!-- <div class="profile-info-row">
+                                                    <div class="profile-info-name"> 模块</div>
+                            
+                                                    <div class="profile-info-value">
+                                                        <span  id="moduleName">无</span>
+                                                    </div>
+                                                </div> -->
+                                                <div class="profile-info-row">
+                                                    <div class="profile-info-name">API编号</div>
+                            
+                                                    <div class="profile-info-value">
+                                                        <span  id="apiNo">无</span>
+                                                    </div>
+                                                </div>
+                                                
+                            
+                                                <div class="profile-info-row">
+                                                    <div class="profile-info-name"> API名称 </div>
+                            
+                                                    <div class="profile-info-value">
+                                                        <span  id="requestName">无</span>
+                                                    </div>
+                                                </div>
+                            
+                                                <div class="profile-info-row">
+                                                    <div class="profile-info-name"> 请求路径 </div>
+                            
+                                                    <div class="profile-info-value">
+                                                        <span  id="url">无</span>
+                                                    </div>
+                                                </div>
+                            
+                                                <div class="profile-info-row">
+                                                    <div class="profile-info-name"> 请求方法 </div>
+                            
+                                                    <div class="profile-info-value">
+                                                        <span  id="reqMethod">无</span>
+                                                    </div>
+                                                </div>
+                                                <div class="profile-info-row">
+                                                    <div class="profile-info-name"> 验证要求</div>
+                            
+                                                    <div class="profile-info-value">
+                                                        <span  id="sessionType">无</span>
+                                                    </div>
+                                                </div>
+                                                <div class="profile-info-row">
+                                                    <div class="profile-info-name"> 请求参数 </div>
+                            
+                                                    <div class="profile-info-value">
+                                                        <span  class="editable editable-click text-primary" id="requestParams">请求参数</span>
+                                                    </div>
+                                                </div>
+                            
+                                                <div class="profile-info-row">
+                                                    <div class="profile-info-name"> 正常返回值格式 </div>
+                                                    <div class="profile-info-value">
+                                                        <span  id="returnValue">无</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="profile-info-row">
+                                                    <div class="profile-info-name"> 失败返回值格式 </div>
+                                                    <div class="profile-info-value">
+                                                        <span  id="returnFail">无</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="profile-info-row">
+                                                    <div class="profile-info-name"> 返回值描述 </div>
+                                                    <div class="profile-info-value">
+                                                        <span  id="returnDesc">暂无</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <hr />
+                                                
+                                                <div class="profile-info-row">
+                                                    <div class="profile-info-name"> 编辑者</div>
+                                                    <div class="profile-info-value">
+                                                        <span  id="creator">无</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="profile-info-row">
+                                                    <div class="profile-info-name"> 编辑日期</div>
+                                                    <div class="profile-info-value">
+                                                        <span  id="date">无</span>
+                                                    </div>
+                                                </div>
+                                                
+                                              <!--  <div class="profile-info-row">
+                                                <div class="profile-info-name"> 最后修改者</div>
+                                                    <div class="profile-info-value">
+                                                        <span  id="lastEditor">暂无</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="profile-info-row">
+                                                    <div class="profile-info-name"> 最后修改时间</div>
+                                                    <div class="profile-info-value">
+                                                        <span  id="lastDate">暂无</span>
+                                                    </div>
+                                                </div> -->
+                                                
+                                              </div>
+                                           </div>
+                                        
+                                        <div title="请求参数" >
+                                                <div id="paramContent" class="profile-user-info profile-user-info-striped hide">
+                                                </div>
+                                        </div>
+                                        
+                                        <div title="数据模型" style="padding:10px">
+                                                <h6 class="text-primary">对应后台的数据模型：</h6>
+                                                <textarea id="modelData" class="form-control hide" value="" style="height:360px;color:#000;">
+                                                
+                                                </textarea>
+                                            
+                                        </div>
+                                        
+                                        <div title="API监控">
+                                                <table id="dg_tableMonitor" class="easyui-datagrid" style="height: 420px; padding: 0; margin: 0;"
+                                                        data-options="rownumbers:true, autoRowHeight:true,toolbar:'#toolbar1', 
+                              selectOnCheck:true, checkOnSelect:true,singleSelect:true,method:'get' "
+                                                    >
+                                                    <thead>
+                                                        <tr>
+                                                            <th data-options="field:'ck',checkbox:true"></th>
+                                                            <th field="apiName" width="150" formatter="formatApiName">请求名称</th>
+                                                            <th field="url" width="100" hidden="true">请求路径</th>
+                                                            <th field="status" width="60" formatter="formatStatus">运行状态</th>
+                                                            <th field="lastReqIP" width="90">最后请求IP</th>
+                                                            <th field="requestTimes" width="80">请求次数</th>
+                                                            <th field="lastReqTimeFormat" width="130">最后访问时间</th>
+                                                            <th field="maxRespTime" width="100">执行最长时间(ms)</th>
+                                                            <th field="minRespTime" width="100">执行最短时间(ms)</th>
+                                                        </tr>
+                                                    </thead>
+                                                </table>
+                                            
+                                        </div>
+                                            <!--tab-content-->
+                                     </div><!-- ttt -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                     
+                        
+              </div><!-- col-xs-8 -->
+       
+            </div><!-- col-xs-12 -->
+            
+            </div>
+          </div>
+        </div>
+        <!--page-content-->
+
+
+
+      </div><!-- main-container-inner -->
+  </div><!-- main-container -->
+
+
+
+
+<script type="text/javascript">
+  
+  var myPage = new MyPage("dg_table", "dlg", "dlg_form", "qry_fm");
+  myPage.setRestAPI(thiswebroot+"/apimgr/apiSys.action?")
+  myPage.listUrl = thiswebroot+"/apimgr/apiSys/list.action?";
+  myPage.delayTime = 500;
+  
+  
+  function formatStatus(value, row, index){
+    if(value == 1){
+      return "正常运行";
+    }
+    else if(value == 0){
+      return "停止运行";
+    }
+    else if(value == 2){
+      return "调试运行";
+    }
+    else{
+      return value;
+    }
+  }
+  
+  function formatApiName(value, row, index){
+    return "<span title='"+row.url+"'>"+value+"</span>";
+  }
+  
+  function loadData(){
+    var qryUrl=thiswebroot + "/sysmgr/util/getDoc.action?type=2";
+        var ajax = new MyAjax(qryUrl);
+        ajax.returnType = true;
+        ajax.dealResult = function(result){
+            if(result && result.total > 0){
+              myPage.apiData = result.rows;
+              $("#dg_table").datagrid("loadData",result);
+              $("#dg_table").datagrid({
+                    onSelect : function(index,row) {
+                      //console.log(row);
+                        checkDetail(row);
+                    }
+              });
+            }
+        }
+        ajax.sendData();
+    }
+  
+  function loadMonitorData(){
+    var qryUrl=thiswebroot + "/sysmgr/util/getDoc.action?type=1";
+        var ajax = new MyAjax(qryUrl);
+        ajax.returnType = true;
+        ajax.dealResult = function(result){
+            if(result && result.code == 1){
+              myPage.monitorData = result.data;
+              $("#dg_tableMonitor").datagrid("loadData",result.data);
+            }
+            else{
+              return alertTipMsg(result.msg);
+            }
+        }
+        ajax.sendData();
+    }
+  
+  
+  
+  
+$(function(){
+   
+  myPage.showRequired();
+  loadData();
+  loadMonitorData();
+  
+  
+   $("#apiInfo").removeClass("hide");
+   $("#paramContent").removeClass("hide");
+   $("#modelData").removeClass("hide");
+   $("#modelData").val("");
+   
+   $("#refreshContext").click(function() {
+         $.messager.confirm("提示信息", "确定要刷新后台注解信息！", function(r) {
+             if (r) {
+                 var qryUrl=thiswebroot+"/sysmgr/util/getDoc.action?clear=refresh&page=1&rows=1";
+                 var ajax = new MyAjax(qryUrl);
+                 ajax.returnType = true;
+                 ajax.dealResult = function(result) {
+                     if (result && result.code == 1) {
+                         return alertTipMsg("刷新成功！");
+                     }
+                     else{
+                         return alertTipMsg(result.msg)
+                     }
+                 }
+                 ajax.sendData();
+             } 
+         });
+     });
+
+     
+
+     $("#requestParams").click(function() {
+         $('#tt').tabs('select',"请求参数");
+     });
+  
+  
+  
+  
+});
+
+
+
+function paramHtml(name,value){
+    var html="<div class=\"profile-info-row\">";
+    html=html+"<div class=\"profile-info-name\"> "+name+"</div>";
+    html=html+"<div class=\"profile-info-value\">";
+    html=html+"<span >"+value+"</span>";
+    html=html+"</div>";
+    html=html+"</div>";
+    //console.log(html);
+    return html;
+}
+
+function checkDetail(row){
+    //$("#moduleName").html(row.parentModuleNameEn +"["+row.parentModuleName+"]"+"------->子模块："+row.subModuleName+"["+row.subModuleNameEn+"]");
+    $("#apiNo").html("<strong>no</strong>-["+row.version+"]");
+    $("#sessionType").html(row.sessionType +"["+row.sessionDesc+"]");
+    $("#requestName").html(row.apiName);
+    $("#url").html("<a  href='"+row.url+"'  target='_blank'>" + row.url + "</a>");
+    $("#reqMethod").html(row.method);
+    $("#returnValue").html(row.returnValue);
+    $("#returnFail").html(row.returnFail);
+    if(row.method.indexOf("GET")>-1){
+        $("#returnDesc").html(row.returnDesc);
+    }
+    else{
+        if(row.paramsDesc){
+            $("#requestParams").html("查看请求参数；"+row.paramsDesc);
+        }
+        else{
+            $("#requestParams").html("查看请求参数；");
+        }
+        $("#returnDesc").html("&nbsp;");
+    }
+    $("#creator").html(row.author);
+    $("#date").html(row.editDate);
+    /* if(row.author.lastEditor){
+        $("#lastEditor").html(row.author.lastEditor);
+        $("#lastDate").html(row.author.lastDate);
+    } */
+    if(row.returnModel){
+        $("#modelData").val(row.returnModel);
+    }
+    else{
+        $("#modelData").val("");
+    }
+    $('#dlg').window('open');
+    $("#paramContent").html("");
+    loadParam(row.params);
+    
+    //var test=formatJson(row.modelJson);
+    //console.log(test);
+    
+}
+
+function loadParam(params){
+    var content="";
+    var paramInfo="";
+    var reqStr = "是";
+    for(var i=0;i< params.length;i++){
+        paramInfo="<strong class='text-primary'>名称：</strong>[<strong>"+params[i].field+"</strong>]--"+params[i].name;
+        paramInfo=paramInfo+"&nbsp;&nbsp;&nbsp;<strong class='text-primary'>类型：</strong>"+params[i].paramType;
+        reqStr = "否";
+        if(params[i].required){
+            reqStr = "是";
+        }
+        paramInfo=paramInfo+"&nbsp;&nbsp;&nbsp;<strong class='text-primary'>是否必传：</strong>"+reqStr;
+        if(params[i].defautlValue){
+            paramInfo=paramInfo+"&nbsp;&nbsp;&nbsp;<strong class='text-primary'>默认值：</strong>"+params[i].defautlValue;
+        }
+        if(params[i].maxLength){
+            paramInfo=paramInfo+"&nbsp;&nbsp;&nbsp;<strong class='text-primary'>最大长度：</strong>"+params[i].maxLength;
+        }
+        if(params[i].minLength){
+            paramInfo=paramInfo+"&nbsp;&nbsp;&nbsp;<strong class='text-primary'>最小长度：</strong>"+params[i].minLength;
+        }
+        content=content+paramHtml("基本信息",paramInfo);
+        /* content=content+paramHtml("参数类型",params[i].type);
+        content=content+paramHtml("是否必传",params[i].required); */
+        
+        //content=content+paramHtml("默认值",params[i].defautlValue+"&nbsp;");
+        if(params[i].paramDesc){
+            content=content+paramHtml("描述",params[i].paramDesc+"&nbsp;");
+        }
+        else{
+            content=content+paramHtml("描述","无");
+        }
+        content=content+"<div style='width:100%;margin-top:1px;border-top:1px dotted #dcebf7;'>&nbsp;</div>";
+    }
+    $("#paramContent").append(content);
+}
+
+
+
+function filterTables(input){
+    var allTableRows = myPage.apiData;
+    //console.log(allTableRows)
+    if(allTableRows){
+        var value = input.value;
+        //console.log(value);
+        var rows = [];
+        var rowFlag = 0;
+        var length = allTableRows.length;
+        for(var i=0; i< length; i++){
+            var row = allTableRows[i];
+            if(row.apiName.indexOf(value) >-1 || row.url.indexOf(value) >-1){
+                rows[rowFlag] = allTableRows[i];
+                rowFlag++;
+            }
+        }
+        var data = {};
+        data.total = rowFlag;
+        data.rows = rows;
+        $("#dg_table").datagrid("loadData",data);
+    }
+}
+
+function filterMonitor(input){
+    var allTableRows = myPage.monitorData;
+    //console.log(allTableRows)
+    if(allTableRows){
+        var value = input.value;
+        //console.log(value);
+        var rows = [];
+        var rowFlag = 0;
+        var length = allTableRows.length;
+        for(var i=0; i< length; i++){
+            var row = allTableRows[i];
+            if(row.apiName.indexOf(value) >-1 || row.url.indexOf(value) >-1){
+                rows[rowFlag] = allTableRows[i];
+                rowFlag++;
+            }
+        }
+        var data = {};
+        data.total = rowFlag;
+        data.rows = rows;
+        $("#dg_tableMonitor").datagrid("loadData",data);
+    }
+}
+
+ </script>
+  
+</body>
+</html>

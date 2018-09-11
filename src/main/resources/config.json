@@ -1,0 +1,3 @@
+{
+  "mapperBasePackage":"sqlSessionFactory:mapperConfig,sqlSessionFactoryDc:mapperConfigDc"
+}
